@@ -9,7 +9,8 @@ import re
 from grabbers.chesscom_grabber import ChesscomGrabber
 from grabbers.lichess_grabber import LichessGrabber
 from utilities import char_to_num
-import keyboard
+if sys.platform != "darwin":
+    import keyboard
 
 
 class StockfishBot(multiprocess.Process):
@@ -223,7 +224,7 @@ class StockfishBot(multiprocess.Process):
                             ((int(move_start_pos[0]), int(move_start_pos[1])), (int(move_end_pos[0]), int(move_end_pos[1]))),
                         ])
                         while True:
-                            if keyboard.is_pressed("3"):
+                            if sys.platform != "darwin" and keyboard.is_pressed("3"):
                                 break
 
                             if len(move_list) != len(self.grabber.get_move_list()):

@@ -12,7 +12,12 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from overlay import run
 from stockfish_bot import StockfishBot
 from selenium.common import WebDriverException
-import keyboard
+import sys
+
+# The 'keyboard' lib crashes on macOS (calls Carbon TIS APIs off the main thread)
+IS_MAC = sys.platform == "darwin"
+if not IS_MAC:
+    import keyboard
 
 
 class GUI:
@@ -360,10 +365,15 @@ class GUI:
         process_communicator_thread.start()
 
         # Start the keyboard listener thread
-        keyboard_listener_thread = threading.Thread(
-            target=self.keypress_listener_thread
-        )
-        keyboard_listener_thread.start()
+        if IS_MAC:
+            # Use Tk key bindings instead (only when the PawnBit window has focus)
+            master.bind("1", lambda e: self.opened_browser and self.on_start_button_listener())
+            master.bind("2", lambda e: self.opened_browser and self.on_stop_button_listener())
+        else:
+            keyboard_listener_thread = threading.Thread(
+                target=self.keypress_listener_thread
+            )
+            keyboard_listener_thread.start()
 
     # Detects if the user pressed the close button
     def on_close_listener(self):
@@ -531,7 +541,8 @@ class GUI:
             chrome_install = ChromeDriverManager().install()
 
             folder = os.path.dirname(chrome_install)
-            chromedriver_path = os.path.join(folder, "chromedriver.exe")
+            exe_name = "chromedriver.exe" if os.name == "nt" else "chromedriver"
+            chromedriver_path = os.path.join(folder, exe_name)
 
             service = ChromeService(chromedriver_path)
             self.chrome = webdriver.Chrome(
