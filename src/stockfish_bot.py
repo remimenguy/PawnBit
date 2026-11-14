@@ -75,7 +75,7 @@ class StockfishBot(multiprocess.Process):
         # Drag the piece from the start to the end position
         pyautogui.moveTo(start_pos[0], start_pos[1])
         time.sleep(self.mouse_latency)
-        pyautogui.dragTo(end_pos[0], end_pos[1])
+        pyautogui.dragTo(end_pos[0], end_pos[1], button='left')
 
         # Check for promotion. If there is a promotion,
         # promote to the corresponding piece type

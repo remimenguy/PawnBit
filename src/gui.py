@@ -831,6 +831,11 @@ class GUI:
 
 
 if __name__ == "__main__":
+    # On macOS, forking after pyautogui/Tk (Quartz/AppKit) are loaded makes every
+    # subprocess started from the child (i.e. Stockfish) get SIGKILLed.
+    # Use "spawn" so the bot process starts clean.
+    if IS_MAC:
+        multiprocess.set_start_method("spawn", force=True)
     window = tk.Tk()
     my_gui = GUI(window)
     window.mainloop()
